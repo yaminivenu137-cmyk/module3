@@ -1,0 +1,83 @@
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: ImageCardList(),
+    );
+  }
+}
+
+class ImageCardList extends StatelessWidget {
+  const ImageCardList({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Firestore Image Cards")),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance.collection("images").snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text("No data found"));
+          }
+
+          var docs = snapshot.data!.docs;
+
+          return ListView.builder(
+            itemCount: docs.length,
+            itemBuilder: (context, index) {
+              var data = docs[index];
+              return TweenAnimationBuilder<Offset>(
+                duration: const Duration(milliseconds: 600),
+                tween: Tween(
+                  begin: const Offset(-1, 0),
+                  end: Offset.zero,
+                ),
+                builder: (context, value, child) {
+                  return Transform.translate(
+                    offset: value * 200,
+                    child: child,
+                  );
+                },
+                child: Card(
+                  margin: const EdgeInsets.all(10),
+                  elevation: 5,
+                  child: Row(
+                    children: [
+                      Image.network(
+                        data["imageUrl"],
+                        width: 100,
+                        height: 100,
+                        fit: BoxFit.cover,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          data["text"] ?? "No Text",
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}

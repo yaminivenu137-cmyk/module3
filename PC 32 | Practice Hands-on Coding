@@ -1,0 +1,84 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+void main() {
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => CounterProvider(),
+      child: const MyApp(),
+    ),
+  );
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: CounterScreen(),
+    );
+  }
+}
+
+// Provider class
+class CounterProvider extends ChangeNotifier {
+  int _count = 0;
+
+  int get count => _count;
+
+  void increment() {
+    _count++;
+    notifyListeners(); // update UI
+  }
+}
+
+// Main screen
+class CounterScreen extends StatelessWidget {
+  const CounterScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Provider Counter Example")),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          CounterDisplayWidget(),
+          SizedBox(height: 20),
+          IncrementButton(),
+        ],
+      ),
+    );
+  }
+}
+
+// Display widget (listens to provider)
+class CounterDisplayWidget extends StatelessWidget {
+  const CounterDisplayWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final count = Provider.of<CounterProvider>(context).count;
+
+    return Text(
+      "Counter Value: $count",
+      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+    );
+  }
+}
+
+// Button widget (updates provider)
+class IncrementButton extends StatelessWidget {
+  const IncrementButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () =>
+          Provider.of<CounterProvider>(context, listen: false).increment(),
+      child: const Text("Increment Counter"),
+    );
+  }
+}

@@ -1,0 +1,122 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+void main() {
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => FormDataProvider(),
+      child: const MyApp(),
+    ),
+  );
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: FormScreen(),
+    );
+  }
+}
+
+// Provider class
+class FormDataProvider extends ChangeNotifier {
+  String _firstName = "";
+  String _lastName = "";
+
+  String get firstName => _firstName;
+  String get lastName => _lastName;
+
+  void setFormData(String fName, String lName) {
+    _firstName = fName;
+    _lastName = lName;
+    notifyListeners();
+  }
+}
+
+// Form Screen
+class FormScreen extends StatefulWidget {
+  const FormScreen({super.key});
+
+  @override
+  State<FormScreen> createState() => _FormScreenState();
+}
+
+class _FormScreenState extends State<FormScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      Provider.of<FormDataProvider>(context, listen: false).setFormData(
+        _firstNameController.text,
+        _lastNameController.text,
+      );
+
+      // Navigate to another screen to display data
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const DisplayDataScreen()),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Form with Provider")),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              TextFormField(
+                controller: _firstNameController,
+                decoration: const InputDecoration(labelText: "First Name"),
+                validator: (value) =>
+                    value == null || value.isEmpty ? "Enter first name" : null,
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: _lastNameController,
+                decoration: const InputDecoration(labelText: "Last Name"),
+                validator: (value) =>
+                    value == null || value.isEmpty ? "Enter last name" : null,
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _submitForm,
+                child: const Text("Submit"),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Display screen consuming provider data
+class DisplayDataScreen extends StatelessWidget {
+  const DisplayDataScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final formData = Provider.of<FormDataProvider>(context);
+
+    return Scaffold(
+      appBar: AppBar(title: const Text("Display Data")),
+      body: Center(
+        child: Text(
+          "Hello, ${formData.firstName} ${formData.lastName}!",
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
+}

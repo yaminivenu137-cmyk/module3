@@ -1,0 +1,95 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+void main() {
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => StringListProvider(),
+      child: const MyApp(),
+    ),
+  );
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: StringListScreen(),
+    );
+  }
+}
+
+class StringListProvider extends ChangeNotifier {
+  final List<String> _items = [];
+
+  List<String> get items => _items;
+
+  void addString(String value) {
+    _items.add(value);
+    notifyListeners();
+  }
+}
+
+class StringListScreen extends StatefulWidget {
+  const StringListScreen({super.key});
+
+  @override
+  State<StringListScreen> createState() => _StringListScreenState();
+}
+
+class _StringListScreenState extends State<StringListScreen> {
+  final TextEditingController _controller = TextEditingController();
+
+  void _addItem() {
+    if (_controller.text.isNotEmpty) {
+      Provider.of<StringListProvider>(context, listen: false)
+          .addString(_controller.text);
+      _controller.clear();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final items = Provider.of<StringListProvider>(context).items;
+
+    return Scaffold(
+      appBar: AppBar(title: const Text("Provider String List")),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    decoration: const InputDecoration(
+                      labelText: "Enter String",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: _addItem,
+                  child: const Text("Add"),
+                )
+              ],
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: items.length,
+              itemBuilder: (context, index) => ListTile(
+                title: Text(items[index]),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -1,0 +1,141 @@
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      title: 'AlertDialog Form Example',
+      home: HomeScreen(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String? name, lastName, email, phone;
+
+  // Load stored data on app start
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      name = prefs.getString("name");
+      lastName = prefs.getString("lastName");
+      email = prefs.getString("email");
+      phone = prefs.getString("phone");
+    });
+  }
+
+  Future<void> _showFormDialog() async {
+    final formKey = GlobalKey<FormState>();
+    final nameController = TextEditingController();
+    final lastNameController = TextEditingController();
+    final emailController = TextEditingController();
+    final phoneController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Enter Details"),
+          content: Form(
+            key: formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: nameController,
+                    decoration: const InputDecoration(labelText: "First Name"),
+                    validator: (val) =>
+                        val!.isEmpty ? "Enter first name" : null,
+                  ),
+                  TextFormField(
+                    controller: lastNameController,
+                    decoration: const InputDecoration(labelText: "Last Name"),
+                    validator: (val) =>
+                        val!.isEmpty ? "Enter last name" : null,
+                  ),
+                  TextFormField(
+                    controller: emailController,
+                    decoration: const InputDecoration(labelText: "Email"),
+                    validator: (val) =>
+                        val!.isEmpty ? "Enter email" : null,
+                  ),
+                  TextFormField(
+                    controller: phoneController,
+                    decoration: const InputDecoration(labelText: "Phone"),
+                    validator: (val) =>
+                        val!.isEmpty ? "Enter phone number" : null,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (formKey.currentState!.validate()) {
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.setString("name", nameController.text);
+                  await prefs.setString("lastName", lastNameController.text);
+                  await prefs.setString("email", emailController.text);
+                  await prefs.setString("phone", phoneController.text);
+
+                  Navigator.pop(context);
+                  _loadData(); // Refresh UI with new data
+                }
+              },
+              child: const Text("Submit"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("SharedPreferences Example")),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("Name: ${name ?? '-'}"),
+            Text("Last Name: ${lastName ?? '-'}"),
+            Text("Email: ${email ?? '-'}"),
+            Text("Phone: ${phone ?? '-'}"),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _showFormDialog,
+              child: const Text("Open Form"),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

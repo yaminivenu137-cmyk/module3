@@ -1,0 +1,68 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: ImageListScreen(),
+    );
+  }
+}
+
+class ImageListScreen extends StatelessWidget {
+  const ImageListScreen({super.key});
+
+  final String image1 =
+      "https://i.picsum.photos/id/9/250/250.jpg?hmac=tqDH5wEWHDN76mBIWEPzg1in6egMl49qZeguSaH9_VI";
+  final String image2 =
+      "https://images.pexels.com/photos/213780/pexels-photo-213780.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500";
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Odd/Even Image List")),
+      body: ListView.builder(
+        itemCount: 20, // max count 20
+        itemBuilder: (context, index) {
+          String imageUrl = index % 2 == 0 ? image2 : image1;
+
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Stack(
+              alignment: Alignment.topLeft,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.network(
+                    imageUrl,
+                    height: 200,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  color: Colors.black54,
+                  child: Text(
+                    "Index: $index",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}

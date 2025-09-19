@@ -1,0 +1,66 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: TextFieldExample(),
+    );
+  }
+}
+
+class TextFieldExample extends StatefulWidget {
+  const TextFieldExample({super.key});
+
+  @override
+  State<TextFieldExample> createState() => _TextFieldExampleState();
+}
+
+class _TextFieldExampleState extends State<TextFieldExample> {
+  final TextEditingController _controller = TextEditingController();
+  String _savedValue = "";
+
+  void _saveInput() {
+    setState(() {
+      _savedValue = _controller.text; // Save input to variable
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("TextFormField Example")),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextFormField(
+              controller: _controller,
+              decoration: const InputDecoration(
+                labelText: "Enter your name",
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _saveInput,
+              child: const Text("Save"),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              "Saved Value: $_savedValue",
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

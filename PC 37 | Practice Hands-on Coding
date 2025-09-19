@@ -1,0 +1,64 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: SlideImageExample(),
+    );
+  }
+}
+
+class SlideImageExample extends StatefulWidget {
+  const SlideImageExample({super.key});
+
+  @override
+  State<SlideImageExample> createState() => _SlideImageExampleState();
+}
+
+class _SlideImageExampleState extends State<SlideImageExample>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<Offset> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 2));
+    _animation = Tween<Offset>(
+      begin: const Offset(-1.0, 0.0),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: SlideTransition(
+          position: _animation,
+          child: Image.network(
+            "https://picsum.photos/250?image=9",
+            width: 250,
+            height: 250,
+          ),
+        ),
+      ),
+    );
+  }
+}

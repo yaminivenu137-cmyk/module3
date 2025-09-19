@@ -1,0 +1,61 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: MoveWidgetScreen(),
+    );
+  }
+}
+
+class MoveWidgetScreen extends StatefulWidget {
+  const MoveWidgetScreen({super.key});
+
+  @override
+  State<MoveWidgetScreen> createState() => _MoveWidgetScreenState();
+}
+
+class _MoveWidgetScreenState extends State<MoveWidgetScreen> {
+  Alignment _alignment = Alignment.topLeft;
+
+  void _moveWidget() {
+    setState(() {
+      _alignment = _alignment == Alignment.topLeft
+          ? Alignment.bottomRight
+          : Alignment.topLeft; // toggle position
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Move Widget Example")),
+      body: Stack(
+        children: [
+          AnimatedAlign(
+            alignment: _alignment,
+            duration: const Duration(seconds: 1),
+            curve: Curves.easeInOut,
+            child: Container(
+              height: 80,
+              width: 80,
+              color: Colors.blue,
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _moveWidget,
+        child: const Icon(Icons.play_arrow),
+      ),
+    );
+  }
+}

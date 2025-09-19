@@ -1,0 +1,54 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const OddEvenApp());
+}
+
+class OddEvenApp extends StatelessWidget {
+  const OddEvenApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      title: "Odd Even Numbers",
+      home: OddEvenScreen(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class OddEvenScreen extends StatelessWidget {
+  const OddEvenScreen({super.key});
+
+  final List<int> numberList = const [10, 12, 13, 56, 27, 29, 30];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Odd & Even Numbers")),
+      body: ListView.builder(
+        itemCount: numberList.length,
+        itemBuilder: (context, index) {
+          int number = numberList[index];
+          bool isEven = number % 2 == 0;
+
+          return ListTile(
+            leading: Icon(
+              isEven ? Icons.check_circle : Icons.cancel,
+              color: isEven ? Colors.green : Colors.red,
+            ),
+            title: Text(
+              "$number",
+              style: TextStyle(
+                fontSize: 20,
+                color: isEven ? Colors.green : Colors.red,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            subtitle: Text(isEven ? "Even Number" : "Odd Number"),
+          );
+        },
+      ),
+    );
+  }
+}

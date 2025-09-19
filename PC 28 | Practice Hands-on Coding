@@ -1,0 +1,83 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: GifTimerScreen(),
+    );
+  }
+}
+
+class GifTimerScreen extends StatefulWidget {
+  const GifTimerScreen({super.key});
+
+  @override
+  State<GifTimerScreen> createState() => _GifTimerScreenState();
+}
+
+class _GifTimerScreenState extends State<GifTimerScreen> {
+  int _elapsedSeconds = 0;
+  late Timer _timer;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Start timer
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        _elapsedSeconds++;
+      });
+
+      if (_elapsedSeconds > 15) {
+        _timer.cancel(); // stop timer after 15 sec
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel(); // cleanup timer
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("GIF Timer Example")),
+      body: Center(
+        child: _elapsedSeconds <= 15
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    "assets/person_running.gif", // add gif in assets
+                    height: 200,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    "Time: $_elapsedSeconds sec",
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                ],
+              )
+            : const Text(
+                "Running time has been over",
+                style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red),
+              ),
+      ),
+    );
+  }
+}
